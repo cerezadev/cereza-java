@@ -1,0 +1,78 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('org.slf4j:slf4j-nop:2.0.0-alpha7')
+    implementation('org.java-websocket:Java-WebSocket:1.5.3')
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.13.2.2')
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    repositories {
+        maven {
+            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                packaging 'jar'
+
+                groupId 'dev.cereza'
+                artifactId 'cereza'
+                version '0.1.0'
+
+                name 'cereza'
+                description 'Easy pub/sub messaging.'
+                url 'https://cereza.dev'
+
+                scm {
+                    connection 'scm:git:git://github.com/cerezadev/cereza-java.git'
+                    developerConnection 'scm:git:ssh://github.com/cerezadev/cereza-java.git'
+                    url 'https://github.com/cerezadev/cereza-java'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'emiliobarradas'
+                        name 'Emilio Barradas'
+                        email 'emilio@cereza.dev'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
